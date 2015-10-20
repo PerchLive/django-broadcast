@@ -1,0 +1,4 @@
+site_name: django-broadcast
+site_description: Video broadcasting support for Django apps
+repo_url: https://github.com/OnlyInAmerica/django-broadcast
+site_dir: html

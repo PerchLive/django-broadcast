@@ -1,0 +1,13 @@
+# Django and REST framework version
+Django==1.8.4
+
+# Test requirements
+pytest-django==2.8.0
+pytest==2.7.2
+pytest-cov==2.2.0
+flake8==2.4.1
+
+# wheel for PyPI installs
+wheel==0.26.0
+
+-e git+https://github.com/PerchLive/storage_provisioner.git@39a65596bb90270cb7e5ce2a3fd0d6357a10d73b#egg=storage_provisioner
