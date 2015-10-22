@@ -18,7 +18,7 @@ These endpoints are all `POST`. Parameters are URL encoded for request, and JSON
 
 #### Request (url encoded)
 
-```json
+```
 {
 	'name' : 'some_name' (optional)
 }
@@ -61,7 +61,7 @@ e.g: `https://endpoint.tld/stream/start/?name=my_stream_name`
 
 #### Request (url encoded)
 
-```json
+```
 {
 	'id' : 'stream_id'
 }
@@ -72,7 +72,7 @@ e.g: `https://endpoint.tld/stream/start/?id=B8C2401D-B2F8-47CD-90BD-53B608D47F3F
 
 #### Response (json encoded)
 
-```json
+```
 {
 	'id' : 'stream_id',
 	'name' : 'some_name',
