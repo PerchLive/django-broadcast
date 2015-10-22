@@ -12,14 +12,13 @@ if not BROADCAST_SETTINGS or len(BROADCAST_SETTINGS.keys()) != 1:
 
 # Required parameters for each Storage Provider
 SUPPORTED_PROVIDERS = {
-    "S3": ["AWS_ACCESS_KEY", "AWS_ACCESS_SECRET", "DEFAULT_POLICY"]
+    "S3": ["AWS_ACCESS_KEY", "AWS_ACCESS_SECRET"]
 }
 
 if BROADCAST_SETTINGS.keys()[0] == "S3":
     s3_params = SUPPORTED_PROVIDERS["S3"]
     STORAGE_PROVISIONER = S3StorageProvisioner(s3_params[0],  # AWS_ACCESS_KEY
-                                               s3_params[1],  # AWS_ACCESS_SECRET
-                                               s3_params[2])  # DEFAULT_POLICY
+                                               s3_params[1])  # AWS_ACCESS_SECRET
 
 if STORAGE_PROVISIONER is None:
     raise RuntimeError("settings.BROADCAST_STORAGE_SETTINGS contained an invalid selection")

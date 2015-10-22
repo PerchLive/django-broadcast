@@ -47,11 +47,7 @@ e.g: `https://endpoint.tld/stream/start/?name=my_stream_name`
 			'aws_bucket_path': 'path',
 			'aws_region': 'us-west-1' // valid amazon region string
 		}
-		'HTTP': {
-		    'endpoint': 'https://example.com/upload/' // TBD
-		    'auth': 'whatever'
-		}
-		// other endpoints could go here, like RTMP, WebRTC, etc
+		// future endpoints could go here, like RTMP, WebRTC, etc
 	}
 }
 
@@ -106,42 +102,9 @@ BROADCAST_SETTINGS = {
     "S3": {
         "AWS_ACCESS_KEY" : "your_aws_access_key"
         "AWS_ACCESS_SECRET": "your_aws_access_secret"
-        "DEFAULT_POLICY": "your_default_s3_policy"
     }
 }
 
-```
-
-An example value for `DEFAULT_POLICY`:
-
-```json
-{
-   "Version":"2012-10-17",
-   "Statement":[
-      {
-         "Effect":"Allow",
-         "Action":[
-            "s3:PutObject",
-            "s3:PutObjectAcl",
-            "s3:PutObjectAclVersion",
-            "s3:GetObject",
-            "s3:GetObjectVersion",
-            "s3:DeleteObject",
-            "s3:DeleteObjectVersion"
-         ],
-         "Resource":"arn:aws:s3:::BUCKET_NAME/PATH/*"
-      },
-      {
-         "Effect":"Allow",
-         "Action":[
-            "s3:ListBucket",
-            "s3:GetBucketLocation",
-            "s3:ListAllMyBuckets"
-         ],
-         "Resource":"arn:aws:s3:::BUCKET_NAME/PATH"
-      }
-   ]
-}
 ```
 
 Testing
