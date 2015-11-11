@@ -1,23 +1,17 @@
 import os
 
-def test_path_prefix():
-    prefix = 'test_prefix'
-    print(prefix)
-    return prefix
-
+from django_broadcast.o import *
 
 def pytest_configure():
     from django.conf import settings
 
     try:
-        from tests.secrets import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
-        aws_access_key_id = AWS_ACCESS_KEY_ID
-        aws_secret_access_key = AWS_SECRET_ACCESS_KEY
+        from secrets import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
     except ImportError:
-        aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
-        aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+        AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
-        if aws_access_key_id is None or aws_secret_access_key is None:
+        if AWS_ACCESS_KEY_ID is None or AWS_SECRET_ACCESS_KEY is None:
             raise EnvironmentError("AWS Credentials not present!")
 
     settings.configure(
@@ -50,8 +44,7 @@ def pytest_configure():
             'django.contrib.staticfiles',
 
             'rest_framework',
-            'django_broadcast',
-            #'rest_framework.authtoken',
+            'rest_framework.authtoken',
             'tests',
         ),
         PASSWORD_HASHERS=(
@@ -63,12 +56,11 @@ def pytest_configure():
             'django.contrib.auth.hashers.CryptPasswordHasher',
         ),
         BROADCAST_SETTINGS={
-            'STREAM_MODEL': 'django_broadcast.HlsStream', # Must always extend Stream
+            'STREAM_MODEL': 'django_broadcast.models.HlsStream',
             'S3': {
-                'AWS_ACCESS_KEY_ID': aws_access_key_id,
-                'AWS_SECRET_ACCESS_KEY': aws_secret_access_key,
-                'BUCKET': 'test_bucket'
-            },
+
+            }
+
         }
     )
 
