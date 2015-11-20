@@ -20,12 +20,13 @@ These endpoints are all `POST`. Parameters are URL encoded for request, and JSON
 
 ```
 {
+    'type' : 'hls' (this is the only option currently supported)
 	'name' : 'some_name' (optional)
 }
 
 ```
 
-e.g: `https://endpoint.tld/stream/start/?name=my_stream_name`
+e.g: `https://endpoint.tld/stream/start/?name=some_name&type=hls`
 	
 
 #### Response (json encoded)

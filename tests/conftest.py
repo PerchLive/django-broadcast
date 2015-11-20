@@ -1,5 +1,8 @@
 import os
 
+TEST_S3_BUCKET = 'test_bucket'
+TEST_STREAM_MODEL = 'django_broadcast.HlsStream'
+
 def test_path_prefix():
     prefix = 'test_prefix'
     print(prefix)
@@ -63,11 +66,11 @@ def pytest_configure():
             'django.contrib.auth.hashers.CryptPasswordHasher',
         ),
         BROADCAST_SETTINGS={
-            'STREAM_MODEL': 'django_broadcast.HlsStream', # Must always extend Stream
+            'STREAM_MODEL': TEST_STREAM_MODEL,  # Must always extend Stream
             'S3': {
                 'AWS_ACCESS_KEY_ID': aws_access_key_id,
                 'AWS_SECRET_ACCESS_KEY': aws_secret_access_key,
-                'BUCKET': 'test_bucket'
+                'BUCKET': TEST_S3_BUCKET
             },
         }
     )
