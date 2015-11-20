@@ -5,6 +5,7 @@ from django.core import serializers
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest
 from storage_provisioner.provisioner import S3StorageProvisioner
+from storage_provisioner.storage import S3Storage
 
 import settings
 from django_broadcast.models import Stream
@@ -80,6 +81,10 @@ def prepare_hls_start_stream_response(dict) -> str:
     :return: a serialized string suitable for passing to the client
     """
 
+    # We currently only support S3 storage backend
+    if not isinstance(dict['storage'], S3Storage):
+        raise NotImplementedError
+
     # Stream is a Django Model : Use Django serializer
     json_serializer = serializers.get_serializer('json')()
     serialized_stream = json_serializer.serialize([dict["stream"]])
@@ -91,4 +96,4 @@ def prepare_hls_start_stream_response(dict) -> str:
     serialized_storage = json.dumps(storage_dict)
 
     return json.dumps({"stream": serialized_stream,
-                       "storage": serialized_storage})
+                       "S3": serialized_storage})
