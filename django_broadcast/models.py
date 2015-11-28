@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.conf import settings
 
 __author__ = 'dbro'
 
@@ -22,7 +22,7 @@ class Stream(models.Model):
     is_live = models.BooleanField(default=False)
     start_date = models.DateTimeField(auto_now_add=True)
     stop_date = models.DateTimeField(blank=True, null=True)
-    owner = models.ForeignKey(User)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL)
 
     def path_prefix(self):
         raise NotImplementedError
