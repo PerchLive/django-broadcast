@@ -69,15 +69,49 @@ e.g: `https://endpoint.tld/stream/start/?id=B8C2401D-B2F8-47CD-90BD-53B608D47F3F
 
 #### Response (json encoded)
 
-```
+```javascript
 {
-	'id' : 'stream_id',
-	'name' : 'some_name',
-	'start_date' : '2015-10-22 15:27:40', (time always in GMT)
-	'stop_date' : '2015-10-22 16:27:40', (time always in GMT)
+    'stream': {
+        'id' : 'stream_id',
+        'name' : 'some_name',
+        'start_date' : '2015-10-22 15:27:40', (time always in GMT)
+        'stop_date' : '2015-10-22 16:27:40', (time always in GMT)
+    }
 }
 
 ```
+
+Usage
+---
+We currently recommend your hosting Django application setup the URL and views for `/stream/start` and `/stream/stop`.
+Within those views, you can yield to built-in methods to handle most of the work for you while leaving you ultimate control
+over the request and response formats.
+
+For example, your `/stream/start` view may look like:
+
+```python
+
+    from django.http import HttpResponse
+    from django_broadcast.api import start_hls_stream, prepare_start_hls_stream_response
+
+    def your_start_stream_view(request):
+
+        # Do request validation, etc.
+
+        # Prepare for new Stream : This handles creating storage credentials
+        # and preparing data needed by mobile client
+        start_result = start_hls_stream(request=request)
+        # start_result is a python dictionary with format:
+        # {'stream': ..., 'storage': ...}
+
+        # Use built-in function for standard json serialization
+        # as specified in API section above.
+        serialized_response = prepare_start_hls_stream_response(start_result)
+
+        return HttpResponse(serialized_response, content_type="application/json")
+
+```
+
 
 Requirements
 ------------

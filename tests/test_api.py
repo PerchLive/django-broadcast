@@ -1,11 +1,13 @@
+import json
+from datetime import datetime
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test import RequestFactory
-from django_broadcast.api import start_hls_stream, stop_stream
 from tests.conftest import TEST_S3_BUCKET, TEST_STREAM_MODEL
 from tests.secrets import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
-from api import prepare_hls_start_stream_response
+from api import start_hls_stream, stop_stream, prepare_start_hls_stream_response, prepare_stop_stream_response, DATE_FORMAT
 from settings import STREAM_MODEL
 
 
@@ -44,8 +46,15 @@ class ApiTestCase(TestCase):
         self.assertEqual(stream.name, test_stream_name)
         self.assertTrue(stream.is_live)
 
-        start_response = prepare_hls_start_stream_response(start_result)
-        # TODO : Assert Storage, Stream, response parameters are all valid
+        start_response = prepare_start_hls_stream_response(start_result)
+        start_response_dict = json.loads(start_response)
+        self.assertEqual(stream.id, start_response_dict['stream']['id'])
+        self.assertEqual(stream.name, start_response_dict['stream']['name'])
+        self.assertEqual(datetime.strftime(stream.start_date, DATE_FORMAT),
+                         start_response_dict['stream']['start_date'])
+
+        self.assertIsNotNone(start_response_dict['endpoint']['S3'])
+        # Testing the validity of storage credentials is handled by storage_provisioner tests
 
         '''
         Stop Stream
@@ -54,7 +63,16 @@ class ApiTestCase(TestCase):
         stop_result = stop_stream(request=stop_request)
 
         self.assertIsNotNone(stop_result)
-        self.assertEqual(stream.id, stop_result['id'])
 
-        refreshed_stream = STREAM_MODEL.objects.get(id=stream.id)
-        self.assertFalse(refreshed_stream.is_live)
+        # Re-query Stream model to pickup changes made by stop_stream
+        stream = STREAM_MODEL.objects.get(id=stream.id)
+        self.assertFalse(stream.is_live)
+
+        stop_response = prepare_stop_stream_response(stop_result)
+        stop_response_dict = json.loads(stop_response)
+        self.assertEqual(stream.id, stop_response_dict['stream']['id'])
+        self.assertEqual(stream.name, stop_response_dict['stream']['name'])
+        self.assertEqual(datetime.strftime(stream.start_date, DATE_FORMAT),
+                         stop_response_dict['stream']['start_date'])
+        self.assertEqual(datetime.strftime(stream.stop_date, DATE_FORMAT),
+                         stop_response_dict['stream']['stop_date'])
