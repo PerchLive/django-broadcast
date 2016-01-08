@@ -134,11 +134,11 @@ Currently django-broadcast supports an `S3` backend:
 
 ```python
 BROADCAST_SETTINGS = {
-    "STREAM_MODEL": "yourapp.StreamModel",
+    "STREAM_MODEL": "home.Stream",
     "S3": {
-        "AWS_ACCESS_KEY": "your_aws_access_key",
-        "AWS_ACCESS_SECRET": "your_aws_access_secret",
-        "BUCKET": "bucket_name"
+        "AWS_ACCESS_KEY_ID": os.environ.get('DJ_BROADCAST_AWS_ACCESS_KEY', ''),
+        "AWS_SECRET_ACCESS_KEY": os.environ.get('DJ_BROADCAST_AWS_ACCESS_SECRET', ''),
+        "BUCKET": os.environ.get('DJ_BROADCAST_S3_BUCKET', '')
     }
 }
 
