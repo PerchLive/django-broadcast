@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from django.core import serializers
@@ -11,6 +12,8 @@ from django_broadcast import settings
 from django_broadcast.models import Stream
 
 __author__ = 'dbro'
+
+DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 AWS_ACCESS_KEY_ID = settings.aws_access_key_id
 AWS_SECRET_ACCESS_KEY = settings.aws_secret_access_key
@@ -41,8 +44,9 @@ def stop_stream(request: HttpRequest) -> dict:
 
     stream = stream_model.objects.get(id=stream_id)
     stream.is_live = False
+    stream.stop_date = datetime.datetime.utcnow()
     stream.save()
-    return {'id': stream.id}
+    return {'stream': stream}
     # Maybe revoke storage tokens etc.
 
 
@@ -70,30 +74,61 @@ def start_hls_stream(request: HttpRequest) -> dict:
     new_stream.event_manifest = storage.get_url_for_key(new_stream.storage_path('event.m3u8'))
     new_stream.live_manifest = storage.get_url_for_key(new_stream.storage_path('live.m3u8'))
 
-    return {"stream": new_stream, "storage": storage}
+    return {'stream': new_stream, 'storage': storage}
 
 
-def prepare_hls_start_stream_response(dict) -> str:
+def prepare_start_hls_stream_response(start_hls_stream_response: dict) -> str:
     """
     Prepares an API response to be returned to the client based on the result of
     start_hls_stream.
-    :param dict: the result of start_hls_stream
+    :param start_hls_stream_response: the result of start_hls_stream
     :return: a serialized string suitable for passing to the client
     """
 
     # We currently only support S3 storage backend
-    if not isinstance(dict['storage'], S3Storage):
+    if not isinstance(start_hls_stream_response['storage'], S3Storage):
         raise NotImplementedError
 
     # Stream is a Django Model : Use Django serializer
-    json_serializer = serializers.get_serializer('json')()
-    serialized_stream = json_serializer.serialize([dict["stream"]])
+    # Serialize operates on an iterable
+    serialized_stream = serializers.serialize('python',
+                                              [start_hls_stream_response['stream']],
+                                              fields=('id', 'name', 'start_date'))[0]
+    # Django serializer returns {"id":...,"model":..., "fields":...}, but we just want a flat dict.
+    serialized_stream = serialized_stream['fields']
+    serialized_stream['id'] = start_hls_stream_response['stream'].id
+
+    # Serialize datetimes with our specified stftime format.
+    serialized_stream['start_date'] = serialized_stream['start_date'].strftime(DATE_FORMAT)
 
     # Storage is a pure python object: Use Python json serializer
-    storage_dict = dict['storage'].__dict__
+    storage_dict = start_hls_stream_response['storage'].__dict__
     # Convert datetime to appropriate string format
-    storage_dict['aws_expiration'] = storage_dict['aws_expiration'].utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    storage_dict['aws_expiration'] = storage_dict['aws_expiration'].utcnow().strftime(DATE_FORMAT)
     serialized_storage = json.dumps(storage_dict)
 
-    return json.dumps({"stream": serialized_stream,
-                       "S3": serialized_storage})
+    return json.dumps({'stream': serialized_stream,
+                       'endpoint': {'S3': serialized_storage}})
+
+
+def prepare_stop_stream_response(stop_stream_response: dict) -> str:
+    """
+    Prepares an API response to be returned to the client based on the result of
+    stop_stream.
+    :param stop_stream_response: the result of stop_stream
+    :return: a serialized string suitable for passing to the client
+    """
+
+    # Stream is a Django Model : Use Django serializer
+    dict_serializer = serializers.get_serializer('python')()
+    serialized_stream = dict_serializer.serialize([stop_stream_response['stream']],
+                                                  fields=('id', 'name', 'start_date', 'stop_date'))[0]
+    # Django serializer returns {"model":..., "fields":...}, but we just want fields.
+    serialized_stream = serialized_stream['fields']
+    serialized_stream['id'] = stop_stream_response['stream'].id
+
+    # Serialize datetimes with our specified stftime format.
+    serialized_stream['start_date'] = serialized_stream['start_date'].strftime(DATE_FORMAT)
+    serialized_stream['stop_date'] = serialized_stream['stop_date'].strftime(DATE_FORMAT)
+
+    return json.dumps({'stream': serialized_stream})
