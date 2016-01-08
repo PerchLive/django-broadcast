@@ -7,7 +7,7 @@ from django.http import HttpRequest
 from storage_provisioner.provisioner import S3StorageProvisioner
 from storage_provisioner.storage import S3Storage
 
-import settings
+from django_broadcast import settings
 from django_broadcast.models import Stream
 
 __author__ = 'dbro'
