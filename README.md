@@ -44,9 +44,9 @@ e.g: `https://endpoint.tld/stream/start/?name=some_name&type=hls`
 			'aws_secret_access_key': 'secret',
 			'aws_session_token': 'token',
 			'aws_expiration': 3600.0 // in seconds
-			'aws_bucket_name': 'bucket',
-			'aws_bucket_path': 'path',
-			'aws_region': 'us-west-1' // valid amazon region string
+			's3_bucket_name': 'bucket',
+			's3_bucket_path': 'path',
+			's3_bucket_region': 'us-west-1' // valid amazon region string
 		}
 		// future endpoints could go here, like RTMP, WebRTC, etc
 	}
