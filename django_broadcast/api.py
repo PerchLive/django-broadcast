@@ -9,7 +9,7 @@ from storage_provisioner.provisioner import S3StorageProvisioner
 from storage_provisioner.storage import S3Storage
 
 from django_broadcast import settings
-from django_broadcast.models import Stream
+from django_broadcast.models import HlsStream
 
 __author__ = 'dbro'
 
@@ -31,14 +31,14 @@ def start_stream(request: HttpRequest) -> dict:
     :param request:
     :return:
     """
-    stream_type = request.GET.get('type')
+    stream_type = request.POST.get('type')
     if stream_type is 'hls':
         return start_hls_stream(request)
     raise NotImplementedError
 
 
 def stop_stream(request: HttpRequest) -> dict:
-    stream_id = request.GET.get('id')
+    stream_id = request.POST.get('id')
     if stream_id is None:
         raise KeyError
 
@@ -50,7 +50,7 @@ def stop_stream(request: HttpRequest) -> dict:
     # Maybe revoke storage tokens etc.
 
 
-def start_hls_stream(request: HttpRequest) -> dict:
+def start_hls_stream(request: HttpRequest, stream: HlsStream) -> dict:
     """
     Create credentials to for a new HTTP-HLS Stream. This method
     requires that the request corresponds to an authenticated user and
@@ -63,18 +63,17 @@ def start_hls_stream(request: HttpRequest) -> dict:
     if not request.user or not request.user.is_authenticated():
         raise PermissionDenied
 
-    new_stream = stream_model.objects.create(owner=request.user,
-                                             name=request.GET.get('name'),
-                                             is_live=True)
+    stream.is_live = True
 
     storage = PROVISIONER.provision_storage(user_name=request.user.username,
                                             bucket_name=S3_BUCKET_NAME,
-                                            path=new_stream.storage_path())
+                                            path=stream.storage_path())
 
-    new_stream.event_manifest = storage.get_url_for_key(new_stream.storage_path('event.m3u8'))
-    new_stream.live_manifest = storage.get_url_for_key(new_stream.storage_path('live.m3u8'))
+    stream.event_manifest = storage.get_url_for_key(stream.storage_path('event.m3u8'))
+    stream.live_manifest = storage.get_url_for_key(stream.storage_path('live.m3u8'))
+    stream.save()
 
-    return {'stream': new_stream, 'storage': storage}
+    return {'stream': stream, 'storage': storage}
 
 
 def prepare_start_hls_stream_response(start_hls_stream_response: dict) -> str:
@@ -91,24 +90,26 @@ def prepare_start_hls_stream_response(start_hls_stream_response: dict) -> str:
 
     # Stream is a Django Model : Use Django serializer
     # Serialize operates on an iterable
-    serialized_stream = serializers.serialize('python',
-                                              [start_hls_stream_response['stream']],
-                                              fields=('id', 'name', 'start_date'))[0]
+    stream = start_hls_stream_response['stream']
+    serialized_stream = {}
+    # serialized_stream = serializers.serialize('python',
+    #                                           [start_hls_stream_response['stream']],
+    #                                           fields=('id', 'name', 'start_date'))[0]
     # Django serializer returns {"id":...,"model":..., "fields":...}, but we just want a flat dict.
-    serialized_stream = serialized_stream['fields']
-    serialized_stream['id'] = start_hls_stream_response['stream'].id
-
+    # serialized_stream = serialized_stream['fields']
+    serialized_stream['id'] = stream.id
+    serialized_stream['name'] = stream.name
     # Serialize datetimes with our specified stftime format.
-    serialized_stream['start_date'] = serialized_stream['start_date'].strftime(DATE_FORMAT)
+    serialized_stream['start_date'] = stream.start_date.strftime(DATE_FORMAT)
 
     # Storage is a pure python object: Use Python json serializer
     storage_dict = start_hls_stream_response['storage'].__dict__
     # Convert datetime to appropriate string format
     storage_dict['aws_expiration'] = storage_dict['aws_expiration'].utcnow().strftime(DATE_FORMAT)
-    serialized_storage = json.dumps(storage_dict)
+
 
     return json.dumps({'stream': serialized_stream,
-                       'endpoint': {'S3': serialized_storage}})
+                       'endpoint': {'S3': storage_dict}})
 
 
 def prepare_stop_stream_response(stop_stream_response: dict) -> str:
