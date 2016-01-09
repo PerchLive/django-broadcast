@@ -44,9 +44,9 @@ e.g: `https://endpoint.tld/stream/start/?name=some_name&type=hls`
 			'aws_secret_access_key': 'secret',
 			'aws_session_token': 'token',
 			'aws_expiration': 3600.0 // in seconds
-			'aws_bucket_name': 'bucket',
-			'aws_bucket_path': 'path',
-			'aws_region': 'us-west-1' // valid amazon region string
+			's3_bucket_name': 'bucket',
+			's3_bucket_path': 'path',
+			's3_bucket_region': 'us-west-1' // valid amazon region string
 		}
 		// future endpoints could go here, like RTMP, WebRTC, etc
 	}
@@ -134,11 +134,11 @@ Currently django-broadcast supports an `S3` backend:
 
 ```python
 BROADCAST_SETTINGS = {
-	"STREAM_MODEL" : "yourapp.StreamModel"
+    "STREAM_MODEL": "home.Stream",
     "S3": {
-        "AWS_ACCESS_KEY" : "your_aws_access_key",
-        "AWS_ACCESS_SECRET": "your_aws_access_secret"
-        "BUCKET": "bucket_name",
+        "AWS_ACCESS_KEY_ID": os.environ.get('DJ_BROADCAST_AWS_ACCESS_KEY', ''),
+        "AWS_SECRET_ACCESS_KEY": os.environ.get('DJ_BROADCAST_AWS_ACCESS_SECRET', ''),
+        "BUCKET": os.environ.get('DJ_BROADCAST_S3_BUCKET', '')
     }
 }
 
