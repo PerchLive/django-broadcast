@@ -91,7 +91,7 @@ For example, your `/stream/start` view may look like:
 
 ```python
 
-    from django.http import HttpResponse
+    from django.http import JsonResponse
     from django_broadcast.api import start_hls_stream, prepare_start_hls_stream_response
 
     def your_start_stream_view(request):
@@ -104,11 +104,11 @@ For example, your `/stream/start` view may look like:
         # start_result is a python dictionary with format:
         # {'stream': ..., 'storage': ...}
 
-        # Use built-in function for standard json serialization
+        # Use built-in function for standard dictionary representation
         # as specified in API section above.
         serialized_response = prepare_start_hls_stream_response(start_result)
 
-        return HttpResponse(serialized_response, content_type="application/json")
+        return JsonResponse({'success': true, 'response': serialized_response})
 
 ```
 

@@ -1,5 +1,4 @@
 import datetime
-import json
 
 from django.core import serializers
 
@@ -76,7 +75,7 @@ def start_hls_stream(request: HttpRequest, stream: HlsStream) -> dict:
     return {'stream': stream, 'storage': storage}
 
 
-def prepare_start_hls_stream_response(start_hls_stream_response: dict) -> str:
+def prepare_start_hls_stream_response(start_hls_stream_response: dict) -> dict:
     """
     Prepares an API response to be returned to the client based on the result of
     start_hls_stream.
@@ -88,31 +87,24 @@ def prepare_start_hls_stream_response(start_hls_stream_response: dict) -> str:
     if not isinstance(start_hls_stream_response['storage'], S3Storage):
         raise NotImplementedError
 
-    # Stream is a Django Model : Use Django serializer
-    # Serialize operates on an iterable
     stream = start_hls_stream_response['stream']
     serialized_stream = {}
-    # serialized_stream = serializers.serialize('python',
-    #                                           [start_hls_stream_response['stream']],
-    #                                           fields=('id', 'name', 'start_date'))[0]
-    # Django serializer returns {"id":...,"model":..., "fields":...}, but we just want a flat dict.
-    # serialized_stream = serialized_stream['fields']
     serialized_stream['id'] = stream.id
     serialized_stream['name'] = stream.name
     # Serialize datetimes with our specified stftime format.
     serialized_stream['start_date'] = stream.start_date.strftime(DATE_FORMAT)
 
-    # Storage is a pure python object: Use Python json serializer
+    # Storage is a pure python object
     storage_dict = start_hls_stream_response['storage'].__dict__
     # Convert datetime to appropriate string format
     storage_dict['aws_expiration'] = storage_dict['aws_expiration'].utcnow().strftime(DATE_FORMAT)
 
 
-    return json.dumps({'stream': serialized_stream,
-                       'endpoint': {'S3': storage_dict}})
+    return {'stream': serialized_stream,
+            'endpoint': {'S3': storage_dict}}
 
 
-def prepare_stop_stream_response(stop_stream_response: dict) -> str:
+def prepare_stop_stream_response(stop_stream_response: dict) -> dict:
     """
     Prepares an API response to be returned to the client based on the result of
     stop_stream.
@@ -132,4 +124,4 @@ def prepare_stop_stream_response(stop_stream_response: dict) -> str:
     serialized_stream['start_date'] = serialized_stream['start_date'].strftime(DATE_FORMAT)
     serialized_stream['stop_date'] = serialized_stream['stop_date'].strftime(DATE_FORMAT)
 
-    return json.dumps({'stream': serialized_stream})
+    return {'stream': serialized_stream}
