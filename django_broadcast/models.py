@@ -17,7 +17,7 @@ class Stream(models.Model):
         The base representation of a video stream
     """
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True, null=True)
     thumbnails = models.ManyToManyField(Thumbnail, related_name='streams')
     is_live = models.BooleanField(default=False)
     start_date = models.DateTimeField(auto_now_add=True)
