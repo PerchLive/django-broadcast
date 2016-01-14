@@ -12,7 +12,6 @@ from django_broadcast.models import HlsStream
 
 __author__ = 'dbro'
 
-DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 AWS_ACCESS_KEY_ID = settings.aws_access_key_id
 AWS_SECRET_ACCESS_KEY = settings.aws_secret_access_key
@@ -92,12 +91,12 @@ def prepare_start_hls_stream_response(start_hls_stream_response: dict) -> dict:
     serialized_stream['id'] = stream.id
     serialized_stream['name'] = stream.name
     # Serialize datetimes with our specified stftime format.
-    serialized_stream['start_date'] = stream.start_date.strftime(DATE_FORMAT)
+    serialized_stream['start_date'] = stream.start_date
 
     # Storage is a pure python object
     storage_dict = start_hls_stream_response['storage'].__dict__
     # Convert datetime to appropriate string format
-    storage_dict['aws_expiration'] = storage_dict['aws_expiration'].utcnow().strftime(DATE_FORMAT)
+    storage_dict['aws_expiration'] = storage_dict['aws_expiration'].utcnow()
 
 
     return {'stream': serialized_stream,
@@ -121,7 +120,7 @@ def prepare_stop_stream_response(stop_stream_response: dict) -> dict:
     serialized_stream['id'] = stop_stream_response['stream'].id
 
     # Serialize datetimes with our specified stftime format.
-    serialized_stream['start_date'] = serialized_stream['start_date'].strftime(DATE_FORMAT)
-    serialized_stream['stop_date'] = serialized_stream['stop_date'].strftime(DATE_FORMAT)
+    serialized_stream['start_date'] = serialized_stream['start_date']
+    serialized_stream['stop_date'] = serialized_stream['stop_date']
 
     return {'stream': serialized_stream}
