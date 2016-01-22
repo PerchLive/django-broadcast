@@ -43,8 +43,8 @@ class Stream(models.Model):
         """
 
         if filename:
-            return "{}/{}".format(self.owner.pk, filename)
-        return "{}/".format(self.owner.pk)
+            return "{}/{}/{}".format(self.owner.pk, self.pk, filename)
+        return "{}/{}/".format(self.owner.pk, self.pk)
 
 
 class HlsStream(Stream):

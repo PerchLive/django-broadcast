@@ -112,15 +112,10 @@ def prepare_stop_stream_response(stop_stream_response: dict) -> dict:
     """
 
     # Stream is a Django Model : Use Django serializer
-    dict_serializer = serializers.get_serializer('python')()
-    serialized_stream = dict_serializer.serialize([stop_stream_response['stream']],
-                                                  fields=('id', 'name', 'start_date', 'stop_date'))[0]
-    # Django serializer returns {"model":..., "fields":...}, but we just want fields.
-    serialized_stream = serialized_stream['fields']
+    serialized_stream = {}
     serialized_stream['id'] = stop_stream_response['stream'].id
-
-    # Serialize datetimes with our specified stftime format.
-    serialized_stream['start_date'] = serialized_stream['start_date']
-    serialized_stream['stop_date'] = serialized_stream['stop_date']
+    serialized_stream['name'] = stop_stream_response['stream'].name
+    serialized_stream['start_date'] = stop_stream_response['stream'].start_date
+    serialized_stream['stop_date'] = stop_stream_response['stream'].stop_date
 
     return {'stream': serialized_stream}
