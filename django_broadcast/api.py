@@ -68,7 +68,7 @@ def start_hls_stream(request: HttpRequest, stream: HlsStream) -> dict:
                                             path=stream.storage_path())
 
     stream.event_manifest = storage.get_url_for_key(stream.storage_path('event.m3u8'))
-    stream.live_manifest = storage.get_url_for_key(stream.storage_path('live.m3u8'))
+    stream.live_manifest = storage.get_url_for_key(stream.storage_path('index.m3u8'))
     stream.save()
 
     return {'stream': stream, 'storage': storage}
