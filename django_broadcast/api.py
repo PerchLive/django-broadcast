@@ -8,7 +8,7 @@ from storage_provisioner.provisioner import S3StorageProvisioner
 from storage_provisioner.storage import S3Storage
 
 from django_broadcast import settings
-from django_broadcast.models import HlsStream
+from django_broadcast.models import HlsStream, Thumbnail
 
 __author__ = 'dbro'
 
