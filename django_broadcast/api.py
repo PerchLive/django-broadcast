@@ -67,7 +67,7 @@ def start_hls_stream(request: HttpRequest, stream: HlsStream) -> dict:
                                             bucket_name=S3_BUCKET_NAME,
                                             path=stream.storage_path())
 
-    stream.event_manifest = storage.get_url_for_key(stream.storage_path('playlist.m3u8'))
+    stream.event_manifest = storage.get_url_for_key(stream.storage_path('vod.m3u8'))
     stream.live_manifest = storage.get_url_for_key(stream.storage_path('index.m3u8'))
 
     thumbnail_path = storage.get_url_for_key(stream.storage_path('thumb.jpg'))
