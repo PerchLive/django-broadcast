@@ -74,7 +74,12 @@ setup(
     author_email=author_email,
     packages=get_packages(package),
     package_data=get_package_data(package),
-    install_requires=["storage_provisioner"],
+    install_requires=[
+        'storage_provisioner==0.1.0',
+    ],
+    dependency_links=[
+        'https://github.com/PerchLive/storage_provisioner/archive/81762a185d38c16b5394b8afad00e9aa1bcec55b.zip#egg=storage_provisioner-0.1.0',
+    ],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Environment :: Web Environment',
