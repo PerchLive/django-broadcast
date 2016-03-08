@@ -5,23 +5,17 @@ import os
 import sys
 from setuptools import setup
 
+with open(os.path.join(os.path.dirname(__file__), 'requirements.txt')) as f:
+    requirements = f.read().splitlines()
 
 name = 'django-broadcast'
 package = 'django_broadcast'
 description = 'Video broadcasting support for Django apps'
 url = 'https://github.com/OnlyInAmerica/django-broadcast'
-author = 'David Brodsky'
-author_email = 'davidpbrodsky@gmail.com'
+author = 'David Brodsky, Chris Ballinger'
+author_email = 'dbro@dbro.pro, chrisballinger@gmail.com'
 license = 'Apache License 2.0'
-
-
-def get_version(package):
-    """
-    Return package version as listed in `__version__` in `init.py`.
-    """
-    init_py = open(os.path.join(package, '__init__.py')).read()
-    return re.search("^__version__ = ['\"]([^'\"]+)['\"]",
-                     init_py, re.MULTILINE).group(1)
+version = '0.1'
 
 
 def get_packages(package):
@@ -49,9 +43,6 @@ def get_package_data(package):
     return {package: filepaths}
 
 
-version = get_version(package)
-
-
 if sys.argv[-1] == 'publish':
     if os.system("pip freeze | grep wheel"):
         print("wheel not installed.\nUse `pip install wheel`.\nExiting.")
@@ -74,7 +65,7 @@ setup(
     author_email=author_email,
     packages=get_packages(package),
     package_data=get_package_data(package),
-    install_requires=["storage_provisioner"],
+    install_requires=requirements,
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Environment :: Web Environment',

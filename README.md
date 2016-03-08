@@ -7,7 +7,8 @@ django-broadcast
 Overview
 --------
 
-Video broadcasting support for Django apps
+Video broadcasting support for Django apps. Designed to abstract provisioning backend storage for video streaming clients behind
+simple "Start Stream" and "Stop Stream" API calls.
 
 API
 ---

@@ -16,5 +16,5 @@ pytest-cov==2.2.0
 pytest-django==2.8.0
 python-dateutil==2.4.2
 six==1.10.0
--e git+https://github.com/PerchLive/storage_provisioner.git@9c2c73434ff06b19d3edfcb1145533333b2e99c1#egg=storage_provisioner-master
+storage-provisioner==0.1.2
 wheel==0.26.0
