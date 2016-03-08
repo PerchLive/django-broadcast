@@ -45,9 +45,9 @@ e.g: `https://endpoint.tld/stream/start/?name=some_name&type=hls`
 			'aws_secret_access_key': 'secret',
 			'aws_session_token': 'token',
 			'aws_expiration': 3600.0 // in seconds
-			'aws_bucket_name': 'bucket',
-			'aws_bucket_path': 'path',
-			'aws_region': 'us-west-1' // valid amazon region string
+			's3_bucket_name': 'bucket',
+			's3_bucket_path': 'path',
+			's3_bucket_region': 'us-west-1' // valid amazon region string
 		}
 		// future endpoints could go here, like RTMP, WebRTC, etc
 	}
@@ -92,7 +92,7 @@ For example, your `/stream/start` view may look like:
 
 ```python
 
-    from django.http import HttpResponse
+    from django.http import JsonResponse
     from django_broadcast.api import start_hls_stream, prepare_start_hls_stream_response
 
     def your_start_stream_view(request):
@@ -105,11 +105,11 @@ For example, your `/stream/start` view may look like:
         # start_result is a python dictionary with format:
         # {'stream': ..., 'storage': ...}
 
-        # Use built-in function for standard json serialization
+        # Use built-in function for standard dictionary representation
         # as specified in API section above.
         serialized_response = prepare_start_hls_stream_response(start_result)
 
-        return HttpResponse(serialized_response, content_type="application/json")
+        return JsonResponse({'success': true, 'response': serialized_response})
 
 ```
 
@@ -135,11 +135,11 @@ Currently django-broadcast supports an `S3` backend:
 
 ```python
 BROADCAST_SETTINGS = {
-	"STREAM_MODEL" : "yourapp.StreamModel"
+    "STREAM_MODEL": "home.Stream",
     "S3": {
-        "AWS_ACCESS_KEY" : "your_aws_access_key",
-        "AWS_ACCESS_SECRET": "your_aws_access_secret"
-        "BUCKET": "bucket_name",
+        "AWS_ACCESS_KEY_ID": os.environ.get('DJ_BROADCAST_AWS_ACCESS_KEY', ''),
+        "AWS_SECRET_ACCESS_KEY": os.environ.get('DJ_BROADCAST_AWS_ACCESS_SECRET', ''),
+        "BUCKET": os.environ.get('DJ_BROADCAST_S3_BUCKET', '')
     }
 }
 

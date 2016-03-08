@@ -17,7 +17,7 @@ class Stream(models.Model):
         The base representation of a video stream
     """
 
-    name = models.CharField(unique=True, max_length=255)
+    name = models.CharField(max_length=255, blank=True, null=True)
     thumbnails = models.ManyToManyField(Thumbnail, related_name='streams')
     is_live = models.BooleanField(default=False)
     start_date = models.DateTimeField(auto_now_add=True)
@@ -43,8 +43,8 @@ class Stream(models.Model):
         """
 
         if filename:
-            return "{}/{}".format(self.owner.pk, filename)
-        return "{}/".format(self.owner.pk)
+            return "{}/{}/{}".format(self.owner.pk, self.pk, filename)
+        return "{}/{}/".format(self.owner.pk, self.pk)
 
 
 class HlsStream(Stream):
