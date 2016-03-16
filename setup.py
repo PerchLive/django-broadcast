@@ -11,11 +11,11 @@ with open(os.path.join(os.path.dirname(__file__), 'requirements.txt')) as f:
 name = 'django-broadcast'
 package = 'django_broadcast'
 description = 'Video broadcasting support for Django apps'
-url = 'https://github.com/OnlyInAmerica/django-broadcast'
+url = 'https://github.com/PerchLive/django-broadcast'
 author = 'David Brodsky, Chris Ballinger'
 author_email = 'dbro@dbro.pro, chrisballinger@gmail.com'
 license = 'Apache License 2.0'
-version = '0.1'
+version = '0.1.1'
 
 
 def get_packages(package):
@@ -74,7 +74,6 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
         'Natural Language :: English',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.5',
         'Topic :: Internet :: WWW/HTTP',
     ]
