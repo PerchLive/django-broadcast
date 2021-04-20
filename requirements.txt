@@ -9,7 +9,7 @@ futures==2.2.0
 jmespath==0.9.0
 mccabe==0.3.1
 pep8==1.5.7
-py==1.4.30
+py==1.10.0
 pyflakes==0.8.1
 pytest==2.7.2
 pytest-cov==2.2.0
